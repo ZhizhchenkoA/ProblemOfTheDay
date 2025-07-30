@@ -1,0 +1,95 @@
+\usepackage{geometry}
+
+\geometry{
+	lmargin=1.5cm,
+	rmargin=1.5cm,
+	headsep=20pt,
+	headheight=35pt,
+	top=75pt,
+	marginpar=0cm,
+	bmargin=50pt,
+	footskip=30pt,
+}
+
+\usepackage{mathtext}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage[english,russian]{babel}
+
+\usepackage{tikz}
+\usepackage[framemethod=TikZ]{mdframed}
+%PATCH for skipbelow in mdframed
+\usepackage{xpatch}
+\makeatletter
+\xpatchcmd{\endmdframed}
+{\aftergroup\endmdf@trivlist\color@endgroup}
+{\endmdf@trivlist\color@endgroup\@doendpe}
+{}{}
+\makeatother
+
+\usepackage{lastpage}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+\usepackage{svg}
+\def\theblock{}
+
+\fancyhead{}
+\fancyfoot{}
+% \fancyhead[L]{\includegraphics[height=0.9\headheight]{img/S2Slogo.png}}
+\fancyhead[R]{\theblock}
+\fancyfoot[R]{ \thepage\space/ \pageref{LastPage}}
+
+% \fancyfoot[R]{\thepage}
+
+\usepackage{tabularx}
+\usepackage{floatrow}
+
+\usepackage{xcolor}
+
+\usepackage{parskip}
+\setlength{\parindent}{0cm} %отступ красная строка
+\setlength{\parskip}{0.7em} %вертикальный отступ между абзацами
+\usepackage{indentfirst}
+
+\usepackage{ifthen}
+\usepackage{xifthen}
+\usepackage{wrapfig}
+\usepackage{amsmath, amsfonts, amssymb, amsthm, mathtools,mathrsfs}
+
+\usepackage{blindtext}
+\usepackage{lipsum}
+\usepackage{etoolbox} 
+
+\pagestyle{fancy}
+\fancyhead{} % очистка
+\fancyfoot{}
+
+\fancyhead[C]{\theblock}
+\fancyfoot[R]{\thepage~из~\pageref{LastPage}}
+
+\newenvironment{task}[1]
+  {%
+    \renewcommand{\theblock}{Задача #1}
+    \begin{mdframed}[
+      roundcorner=5pt,
+      backgroundcolor=gray!10,
+      linecolor=gray!70,
+      linewidth=1pt,
+      frametitle={\textbf{Задача #1}},
+      frametitlerule=true,
+      frametitlerulewidth=1pt,
+      frametitleaboveskip=8pt,
+      frametitlebelowskip=8pt,
+      skipbelow=0.5em,
+      skipabove=1em
+    ]}
+  {\end{mdframed}}
+
+\newenvironment{solution}
+  {\par\vspace{0.5em}\noindent\textbf{Решение.}\par}
+  {\par\vspace{0.5em}\hfill$\square$}
+
+\endinput
