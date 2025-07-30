@@ -56,7 +56,11 @@
 
 \usepackage{ifthen}
 \usepackage{xifthen}
+\usepackage{xparse}
 \usepackage{wrapfig}
+\usepackage{caption}
+\usepackage{graphics}
+
 \usepackage{amsmath, amsfonts, amssymb, amsthm, mathtools,mathrsfs}
 \usepackage{wasysym}
 \usepackage{starfont}
@@ -99,4 +103,16 @@
   \par\vspace{0.5em}%
   \noindent\textbf{Ответ:} #1\par%
 }
+
+
+
+\newcommand{\image}[3][0.3\textwidth]{%
+  \begin{figure}[h]
+    \centering
+    \includegraphics[width=#1]{#2}
+    \caption*{#3}
+    \label{fig:#2}
+  \end{figure}
+}
+
 \endinput

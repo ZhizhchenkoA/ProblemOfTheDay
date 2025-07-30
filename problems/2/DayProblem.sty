@@ -103,16 +103,14 @@
   \par\vspace{0.5em}%
   \noindent\textbf{Ответ:} #1\par%
 }
-
-
-
-\newcommand{\image}[3][0.3\textwidth]{%
-  \begin{figure}[h]
-    \centering
-    \includegraphics[width=#1]{#2}
-    \caption*{#3}
-    \label{fig:#2}
-  \end{figure}
-}
-
 \endinput
+
+\NewDocumentCommand{\image}{O{r} O{0.3\textwidth} m O{} O{}}{%
+  \begin{wrapfigure}{#1}{\dimexpr #2 + 0.02\textwidth}
+    \centering
+    \includegraphics[width=#2]{#3}%
+    \IfValueT{#4}{\par\vspace{0.3em}\includegraphics[width=#2]{#4}}%
+    \IfValueT{#5}{\par\vspace{0.3em}\includegraphics[width=#2]{#5}}%
+    \captionsetup{labelformat=empty}
+  \end{wrapfigure}
+}
