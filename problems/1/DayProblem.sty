@@ -31,18 +31,14 @@
 \usepackage{lastpage}
 
 \usepackage{fancyhdr}
-\pagestyle{fancy}
 
 \usepackage{svg}
 \def\theblock{}
 
 \fancyhead{}
 \fancyfoot{}
-% \fancyhead[L]{\includegraphics[height=0.9\headheight]{img/S2Slogo.png}}
-\fancyhead[R]{\theblock}
-\fancyfoot[R]{ \thepage\space/ \pageref{LastPage}}
 
-% \fancyfoot[R]{\thepage}
+
 
 \usepackage{tabularx}
 \usepackage{floatrow}
@@ -59,7 +55,7 @@
 \usepackage{xparse}
 \usepackage{wrapfig}
 \usepackage{caption}
-\usepackage{graphics}
+\usepackage{graphicx}
 
 \usepackage{amsmath, amsfonts, amssymb, amsthm, mathtools,mathrsfs}
 \usepackage{wasysym}
@@ -70,22 +66,21 @@
 \usepackage{lipsum}
 \usepackage{etoolbox} 
 
-\pagestyle{fancy}
-\fancyhead{} % очистка
-\fancyfoot{}
 
-\fancyhead[C]{\theblock}
-\fancyfoot[R]{\thepage~из~\pageref{LastPage}}
 
-\newenvironment{task}[1]
+\NewDocumentEnvironment{task}{m o} 
   {%
-    \renewcommand{\theblock}{Задача #1}
+    \renewcommand{\theblock}{Задача #1}%
+    \markright{\theblock}
     \begin{mdframed}[
       roundcorner=5pt,
       backgroundcolor=gray!10,
       linecolor=gray!70,
       linewidth=1pt,
-      frametitle={\textbf{Задача #1}},
+      frametitle={
+        \textbf{Задача #1}%
+        \IfValueT{#2}{\hfill \textnormal{\small \textit{Сложность:} #2}}%
+      },
       frametitlerule=true,
       frametitlerulewidth=1pt,
       frametitleaboveskip=8pt,
@@ -106,13 +101,21 @@
 
 
 
-\newcommand{\image}[3][0.3\textwidth]{%
+\usepackage{array}
+\NewDocumentCommand{\image}{O{c} O{0.3\textwidth} m O{} O{} O{} O{}}{%
   \begin{figure}[h]
     \centering
-    \includegraphics[width=#1]{#2}
-    \caption*{#3}
-    \label{fig:#2}
+    \begin{tabular}{@{}#1@{}}
+      \includegraphics[width=#2]{#3}%
+      \IfNoValueF{#4}{\includegraphics[width=#2]{#4}}%
+      \IfNoValueF{#5}{\includegraphics[width=#2]{#5}}%
+    \end{tabular}
+    \IfNoValueF{#6}{\caption*{\centering{#6}}}
+    \IfNoValueF{#7}{\label{#7}}
   \end{figure}
 }
+
+\pagestyle{fancy}
+\fancyhead[R]{\rightmark}
 
 \endinput

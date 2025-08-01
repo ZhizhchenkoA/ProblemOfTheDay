@@ -38,11 +38,8 @@
 
 \fancyhead{}
 \fancyfoot{}
-% \fancyhead[L]{\includegraphics[height=0.9\headheight]{img/S2Slogo.png}}
-\fancyhead[R]{\theblock}
-\fancyfoot[R]{ \thepage\space/ \pageref{LastPage}}
 
-% \fancyfoot[R]{\thepage}
+
 
 \usepackage{tabularx}
 \usepackage{floatrow}
@@ -59,7 +56,7 @@
 \usepackage{xparse}
 \usepackage{wrapfig}
 \usepackage{caption}
-\usepackage{graphics}
+\usepackage{graphicx}
 
 \usepackage{amsmath, amsfonts, amssymb, amsthm, mathtools,mathrsfs}
 \usepackage{wasysym}
@@ -77,15 +74,19 @@
 \fancyhead[C]{\theblock}
 \fancyfoot[R]{\thepage~из~\pageref{LastPage}}
 
-\newenvironment{task}[1]
+
+\NewDocumentEnvironment{task}{m o} 
   {%
-    \renewcommand{\theblock}{Задача #1}
+    \renewcommand{\theblock}{Задача #1}%
     \begin{mdframed}[
       roundcorner=5pt,
       backgroundcolor=gray!10,
       linecolor=gray!70,
       linewidth=1pt,
-      frametitle={\textbf{Задача #1}},
+      frametitle={
+        \textbf{Задача #1}%
+        \IfValueT{#2}{\hfill \textnormal{\small Сложность: #2}}%
+      },
       frametitlerule=true,
       frametitlerulewidth=1pt,
       frametitleaboveskip=8pt,
@@ -103,14 +104,24 @@
   \par\vspace{0.5em}%
   \noindent\textbf{Ответ:} #1\par%
 }
-\endinput
 
-\NewDocumentCommand{\image}{O{r} O{0.3\textwidth} m O{} O{}}{%
-  \begin{wrapfigure}{#1}{\dimexpr #2 + 0.02\textwidth}
+
+
+\usepackage{array}
+\NewDocumentCommand{\image}{O{c} O{0.3\textwidth} m O{} O{} O{} O{}}{%
+  \begin{figure}[h]
     \centering
-    \includegraphics[width=#2]{#3}%
-    \IfValueT{#4}{\par\vspace{0.3em}\includegraphics[width=#2]{#4}}%
-    \IfValueT{#5}{\par\vspace{0.3em}\includegraphics[width=#2]{#5}}%
-    \captionsetup{labelformat=empty}
-  \end{wrapfigure}
+    \begin{tabular}{@{}#1@{}}
+      \includegraphics[width=#2]{#3}%
+      \IfNoValueF{#4}{\includegraphics[width=#2]{#4}}%
+      \IfNoValueF{#5}{\includegraphics[width=#2]{#5}}%
+    \end{tabular}
+    \IfNoValueF{#6}{\caption*{\centering{#6}}}
+    \IfNoValueF{#7}{\label{#7}}
+  \end{figure}
 }
+
+\fancyhead[R]{\theblock}
+\fancyfoot[R]{ \thepage\space/ \pageref{LastPage}}
+
+\endinput
