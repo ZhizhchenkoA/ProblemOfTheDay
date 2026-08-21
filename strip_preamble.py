@@ -1,12 +1,11 @@
 import os
 import glob
 import shutil
+import re
 
-# Файлы и папки, которые НУЖНО оставить в каждой задаче
 ALLOWED_FILES = {'solution.tex'}
 ALLOWED_DIRS = {'img'}
 
-# Расширения временных файлов LaTeX
 LATEX_TEMP_EXTENSIONS = {
     '.aux', '.log', '.out', '.toc', '.lof', '.lot',
     '.synctex.gz', '.synctex', '.fls', '.fdb_latexmk',
@@ -14,34 +13,27 @@ LATEX_TEMP_EXTENSIONS = {
 }
 
 def clean_solution_file(filepath, task_num):
-    """Удаляет преамбулу и исправляет пути к картинкам"""
     with open(filepath, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    # 1. Удаляем преамбулу
+    # 1. Удаляем преамбулу (ИСПРАВЛЕНО: добавлены обратные слеши)
     if '\\begin{document}' in content:
         content = content.split('\\begin{document}', 1)[1]
     
     content = content.replace('\\end{document}', '')
     content = content.strip() + '\n'
 
-    # 2. АВТОМАТИЧЕСКИ ИСПРАВЛЯЕМ ПУТИ К КАРТИНКАМ
-    # Заменяем {img/ на {problems/НОМЕР_ЗАДАЧИ/img/
-    # Заменяем [img/ на [problems/НОМЕР_ЗАДАЧИ/img/
-    # Это работает для всех аргументов команды \image
-    content = content.replace('{img/', '{problems/' + task_num + '/img/')
-    content = content.replace('[img/', '[problems/' + task_num + '/img/')
-    
-    # На случай, если участник написал ./img/
-    content = content.replace('{./img/', '{problems/' + task_num + '/img/')
-    content = content.replace('[./img/', '[problems/' + task_num + '/img/')
+    # 2. АВТОМАТИЧЕСКИ ИСПРАВЛЯЕМ ПУТИ К КАРТИНКАМ (с поддержкой пробелов)
+    content = re.sub(r'\{\s*img/', '{problems/' + task_num + '/img/', content)
+    content = re.sub(r'\[\s*img/', '[problems/' + task_num + '/img/', content)
+    content = re.sub(r'\{\s*\./img/', '{problems/' + task_num + '/img/', content)
+    content = re.sub(r'\[\s*\./img/', '[problems/' + task_num + '/img/', content)
 
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(content)
     print(f"  ✓ Очищена преамбула и исправлены пути: {filepath}")
 
 def clean_task_folder(task_dir):
-    """Удаляет все ненужные файлы из папки задачи, КРОМЕ PDF"""
     if not os.path.isdir(task_dir):
         return
     
@@ -53,7 +45,6 @@ def clean_task_folder(task_dir):
                 print(f"  🗑 Удалена папка: {item_path}")
                 shutil.rmtree(item_path)
             else:
-                # Чистим папку img от временных файлов компиляции
                 for img_file in os.listdir(item_path):
                     img_path = os.path.join(item_path, img_file)
                     if any(img_file.endswith(ext) for ext in LATEX_TEMP_EXTENSIONS):
@@ -61,7 +52,6 @@ def clean_task_folder(task_dir):
                         os.remove(img_path)
         
         elif os.path.isfile(item_path):
-            # НЕ удаляем PDF файлы — они нужны!
             if item.endswith('.pdf'):
                 continue
             
@@ -81,7 +71,7 @@ task_dirs = glob.glob('problems/*')
 
 for task_dir in sorted(task_dirs):
     if os.path.isdir(task_dir):
-        task_num = os.path.basename(task_dir) # Получаем номер задачи, например "001"
+        task_num = os.path.basename(task_dir)
         print(f"\n📁 Обработка: {task_dir} (Задача {task_num})")
         
         sol_file = os.path.join(task_dir, 'solution.tex')
