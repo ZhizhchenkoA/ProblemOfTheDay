@@ -38,11 +38,13 @@ jobs:
           commit_user_name: "GitHub Actions Bot"
           commit_user_email: "actions@github.com"
 
-      - name: Compile Main Book
+      - name: Compile Main Book (ЯВНО ЧЕРЕЗ PDFLATEX)
         uses: xu-cheng/latex-action@v3
         with:
           root_file: main.tex
+          compiler: pdflatex
           extra_system_packages: "python3"
+          args: "-interaction=nonstopmode -file-line-error"
           
       - name: Copy main.pdf to book.pdf
         run: cp main.pdf ./book.pdf
