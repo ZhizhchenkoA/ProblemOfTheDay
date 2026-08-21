@@ -1,0 +1,60 @@
+name: Clean and Compile LaTeX
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  clean-and-build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Clean preamble and remove unnecessary files
+        run: python3 strip_preamble.py
+
+      - name: Update main.tex with new tasks
+        run: python3 update_main.py
+
+      - name: Auto-commit cleaned files
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: auto-clean preamble and update main.tex"
+          file_pattern: "problems/** main.tex"
+          commit_user_name: "GitHub Actions Bot"
+          commit_user_email: "actions@github.com"
+
+      - name: Compile Main Book
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex
+          extra_system_packages: "python3"
+          
+      - name: Copy main.pdf to book.pdf
+        run: cp main.pdf ./book.pdf
+
+      - name: Compile Individual Problems
+        run: python3 build.py
+
+      - name: Auto-commit updated PDFs
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "📚 auto-update book.pdf and problem PDFs"
+          file_pattern: "book.pdf problems/*/*.pdf"
+          commit_user_name: "GitHub Actions Bot"
+          commit_user_email: "actions@github.com"
+          skip_dirty_check: true

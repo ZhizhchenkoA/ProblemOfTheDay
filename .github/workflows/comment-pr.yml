@@ -1,0 +1,27 @@
+name: Comment PR with PDF Link
+
+on:
+  pull_request_target:
+    types: [opened, synchronize]
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    
+    steps:
+      - name: Wait for compilation to finish
+        run: sleep 120
+      
+      - name: Comment PDF link on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: |
+            ## ✅ Задача успешно скомпилирована!
+            
+            📄 [**Скачать PDF вашей задачи**](https://github.com/${{ github.repository }}/blob/main/problems/${{ github.event.pull_request.head.ref }}/problem_${{ github.event.pull_request.head.ref }}.pdf)
+            
+            📚 [**Скачать всю книгу**](https://github.com/${{ github.repository }}/blob/main/book.pdf)
+            
+            Спасибо за вклад! 🚀
