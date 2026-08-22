@@ -28,17 +28,15 @@ def update_main_tex():
     
     print(f"📁 Найдено задач в папке problems/: {len(task_numbers)}")
     
-    # Извлекаем все существующие блоки задач из main.tex
-    # Ищем паттерн: \section{Задача XXX}\n\input{problems/XXX/solution.tex}
-    # Или просто \input{problems/XXX/solution.tex}
+    # Ищем все существующие блоки задач в main.tex
+    # ВАЖНО: Регулярка обновлена, чтобы находить и удалять старые \clearpage
     task_pattern = re.compile(
-        r'(?:\\section\{Задача\s+\d+\}\s*\n)?\\input\{problems/\d+/solution\.tex\}\s*\n?',
+        r'(?:\\clearpage\s*\n)?(?:\\section\{Задача\s+\d+\}\s*\n)?\\input\{problems/\d+/solution\.tex\}\s*\n?',
         re.MULTILINE
     )
     
     existing_tasks = set()
     for match in task_pattern.finditer(content):
-        # Извлекаем номер задачи из найденного блока
         task_num_match = re.search(r'\\input\{problems/(\d+)/solution\.tex\}', match.group(0))
         if task_num_match:
             existing_tasks.add(task_num_match.group(1))
@@ -49,7 +47,6 @@ def update_main_tex():
     content_cleaned = task_pattern.sub('', content)
     
     # Находим место для вставки задач
-    # Ищем комментарий-маркер
     marker_pattern = re.compile(r'%\s*=+\s*\n%\s*ЗДЕСЬ БОТ.*\n%\s*=+\s*\n')
     marker_match = marker_pattern.search(content_cleaned)
     
@@ -57,7 +54,6 @@ def update_main_tex():
         insert_pos = marker_match.end()
         print("🎯 Найден маркер для вставки задач")
     else:
-        # Если маркера нет, ищем место перед \end{document}
         end_doc_match = re.search(r'\\end\{document\}', content_cleaned)
         if not end_doc_match:
             print("❌ Не найден \\end{document} в main.tex!")
@@ -65,10 +61,13 @@ def update_main_tex():
         insert_pos = end_doc_match.start()
         print("⚠️ Маркер не найден, вставляем перед \\end{document}")
     
-    # Формируем новый блок задач в правильном порядке (только \input, без \section)
+    # Формируем новый блок задач в правильном порядке
     tasks_content = ""
     for task_num in task_numbers:
-        tasks_content += f"\\input{{problems/{task_num}/solution.tex}}\n"
+        # ДОБАВЛЯЕМ \clearpage, чтобы каждая задача была с новой страницы
+        # Если вам нужна просто новая строка (абзац) на той же странице, 
+        # замените \\clearpage на \\par
+        tasks_content += f"\\clearpage\n\\input{{problems/{task_num}/solution.tex}}\n"
     
     # Собираем новый контент
     new_content = content_cleaned[:insert_pos] + tasks_content + content_cleaned[insert_pos:]

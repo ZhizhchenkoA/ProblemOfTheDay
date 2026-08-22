@@ -23,7 +23,6 @@ def clean_solution_file(filepath, task_num):
     content = content.replace('\\end{document}', '')
     content = content.strip() + '\n'
 
-    # 2. АВТОМАТИЧЕСКИ ИСПРАВЛЯЕМ ПУТИ К КАРТИНКАМ (с поддержкой пробелов)
     content = re.sub(r'\{\s*img/', '{problems/' + task_num + '/img/', content)
     content = re.sub(r'\[\s*img/', '[problems/' + task_num + '/img/', content)
     content = re.sub(r'\{\s*\./img/', '{problems/' + task_num + '/img/', content)
