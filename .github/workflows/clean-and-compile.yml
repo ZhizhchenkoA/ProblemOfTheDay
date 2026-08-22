@@ -38,19 +38,23 @@ jobs:
           commit_user_name: "GitHub Actions Bot"
           commit_user_email: "actions@github.com"
 
-      - name: Compile Main Book (ЯВНО ЧЕРЕЗ PDFLATEX)
+      - name: Compile Main Book
         uses: xu-cheng/latex-action@v3
         with:
           root_file: main.tex
-          compiler: pdflatex
           extra_system_packages: "python3"
-          args: "-interaction=nonstopmode -file-line-error"
           
       - name: Copy main.pdf to book.pdf
         run: cp main.pdf ./book.pdf
 
-      - name: Compile Individual Problems
-        run: python3 build.py
+      # 🔥 МАГИЯ ЗДЕСЬ: Запускаем build.py внутри Docker-образа с TeX Live
+      - name: Compile Individual Problems (via Docker)
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            ghcr.io/xu-cheng/texlive-full:latest \
+            sh -c "apk add --no-cache python3 && python3 build.py"
 
       - name: Auto-commit updated PDFs
         uses: stefanzweifel/git-auto-commit-action@v5
